@@ -3,6 +3,9 @@ const path = require('path');
 const morgan = require('morgan'); // 요청 응답 기록하는 것 
 const cookieParser = require('cookie-parser');
 const session = require('express-session');
+const multer = require('multer');
+const { fstat } = require('fs');
+const { connect } = require('http2');
 
 const app = express();
 
@@ -13,11 +16,49 @@ app.set('port', process.env.PORT || 3000); //서버에다가 속성을 심는다
 app.use(morgan('dev'));
 app.use('/', express.static(__dirname, 'public'));
 app.use(cookieParser('zerochopassword'));
+app.use(session({
+  resave: false,
+  saveUninitialized: false,
+  secret: 'zerochopassword',
+  cookie: {
+    httpOnly: true,
+  },
+}));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true })); //true 면 qs, false 면 querystring 모듈 쓴다.
 
+app.use('/', (req, res, next) => {
+  req.session.data = 'zerocho비번';
+}); 
+
+try {
+  fs.readdirSync('uploads');
+} catch (error) {
+  console.error('uploads 폴더가 없어 uploads 폴더를 생성 한다.');
+  fs.mkdirSync('uploads');
+}
+
+const upload = multer({
+  storage: multer.diskStorage({
+    destination(req, file, done) {
+      done(null, 'uploads/');
+    },
+    filename(req, file, done) {
+      const ext = path.extname(file.originalname);
+      done(null, path.basename(file.originalname, ext) + Date.now() + ext);
+    },
+  }),
+  limits: { fileSize: 5 * 1024 * 1024 },
+});
+
+app.post('/upload', upload.fields([{name: 'image1', name: 'image2', name: 'image3'}]), (req, res) => { 
+  console.log(req.file);
+  res.send('ok');
+});
 
 app.get('/', (req, res) => {
+  // req.session.id = 'hello'; // 요청한 사람만 id hello가 된다.
+  req.session.data = 'zerocho비번';
   res.sendFile(path.join(__dirname, 'index.html'));
 });
 

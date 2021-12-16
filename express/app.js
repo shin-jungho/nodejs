@@ -1,3 +1,5 @@
+const dotenv = require('dotenv');
+dotenv.config(); // process.env 쓰는값보다 위에 올리기
 const express = require('express');
 const path = require('path');
 const morgan = require('morgan'); // 요청 응답 기록하는 것 
@@ -15,11 +17,11 @@ app.set('port', process.env.PORT || 3000); //서버에다가 속성을 심는다
 
 app.use(morgan('dev'));
 app.use('/', express.static(__dirname, 'public'));
-app.use(cookieParser('zerochopassword'));
+app.use(cookieParser(process.env.COOKIE_SECRET));
 app.use(session({
   resave: false,
   saveUninitialized: false,
-  secret: 'zerochopassword',
+  secret: process.env.COOKIE_SECRET,
   cookie: {
     httpOnly: true,
   },

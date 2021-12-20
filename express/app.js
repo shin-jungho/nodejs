@@ -6,8 +6,8 @@ const morgan = require('morgan'); // 요청 응답 기록하는 것
 const cookieParser = require('cookie-parser');
 const session = require('express-session');
 const multer = require('multer');
-const { fstat } = require('fs');
-const { connect } = require('http2');
+const indexRouter = require('./routes');
+const userRouter = require('./routes/user');
 
 const app = express();
 
@@ -26,8 +26,13 @@ app.use(session({
     httpOnly: true,
   },
 }));
+
+
 app.use(express.json());
 app.use(express.urlencoded({ extended: true })); //true 면 qs, false 면 querystring 모듈 쓴다.
+
+app.use('/', indexRouter);
+app.use('/user', userRouter);
 
 app.use('/', (req, res, next) => {
   req.session.data = 'zerocho비번';

@@ -1,7 +1,7 @@
 const { Worker, isMainThread, parentPort, workerData } = require('worker_threads');
 
 if (isMainThread) { //메인 스레드
-  const threads = new Set();
+  const threads = new Set(); // 중복되지 않는 배열
   threads.add(new Worker(__filename, {
     workerData: { start: 1 },
   }));

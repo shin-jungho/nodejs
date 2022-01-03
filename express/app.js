@@ -1,11 +1,14 @@
+const dotenv = require('dotenv');
 const express = require('express');
 const morgan = require('morgan');
 const cookieParser = require('cookie-parser');
 const session = require('express-session');
-const dotenv = require('dotenv');
 const path = require('path');
 
 dotenv.config();
+const indexRouter = require('./routes');
+const userRouter = require('./routes/user');
+ 
 const app = express();
 app.set('port', process.env.PORT || 3000);
 

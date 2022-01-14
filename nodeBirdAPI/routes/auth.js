@@ -3,6 +3,7 @@ const passport = require('passport');
 const bcrypt = require('bcrypt');
 const User = require('../models/user');
 const { isLoggedIn, isNotLoggedIn } = require('./middlewares');
+
 const router = express.Router();
 
 router.post('/join', isNotLoggedIn, async (req, res, next) => {
@@ -46,7 +47,7 @@ router.post('/login', isNotLoggedIn, (req, res, next) => {
 });
 
 router.get('/logout', isLoggedIn, (req, res) => {
-  // req.user; // 사용자 정보
+  req.user; // 사용자 정보
   req.logout();
   req.session.destroy();
   res.redirect('/');

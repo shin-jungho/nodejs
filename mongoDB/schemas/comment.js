@@ -6,7 +6,7 @@ const commentSchema = new Schema({
   commenter: {
     type: ObjectId,
     required: true,
-    ref: 'User',
+    ref: 'User', // User 스키마 가르키는 것 join과 비슷
   },
   comment: {
     type: String,

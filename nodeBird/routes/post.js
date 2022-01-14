@@ -42,6 +42,7 @@ router.post('/', isLoggedIn, upload2.none(), async (req, res, next) => {
       UserId: req.user.id,
     });
     const hashtags = req.body.content.match(/#[^\s#]*/g); // set로 해쉬태그 중복되는거 없앨 수 있다.
+    // [#노드, #익스프레스] => [노드, 익스프레스]
     if (hashtags) {
       const result = await Promise.all(
         hashtags.map(tag => {

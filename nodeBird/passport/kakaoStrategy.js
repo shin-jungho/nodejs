@@ -7,7 +7,7 @@ module.exports = () => {
   passport.use(new KakaoStrategy({
     clientID: process.env.KAKAO_ID,
     callbackURL: '/auth/kakao/callback',
-  }, async (accessToken, refreshToken, profile, done) => {
+  }, async (accessToken, refreshToken, profile, done) => { //OAUTH2 공부 필요
     console.log('kakao profile', profile);
     try {
       const exUser = await User.findOne({

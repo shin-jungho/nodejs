@@ -8,10 +8,11 @@
   },
   "test": {
     "username": "root",
-    "password": null,
+    "password": "Jungho!995",
     "database": "database_test",
     "host": "127.0.0.1",
-    "dialect": "mysql"
+    "dialect": "mysql",
+    "logging": false
   },
   "production": {
     "username": "root",

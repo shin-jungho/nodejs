@@ -87,4 +87,4 @@ describe('isLoggedIn', () => {
 
 ### ⚠️ test할 대상을 정확히 할 것!!!!!
 
-### ⚠️ promise의 resolve, reject는 비동기 작업의 처리 과정에서 <br>성공/실패</br>를 구분하는 방법!!!!
+### ⚠️ promise의 resolve, reject는 비동기 작업의 처리 과정에서 성공/실패를 구분하는 방법!!!!

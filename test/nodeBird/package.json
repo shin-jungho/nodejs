@@ -4,11 +4,13 @@
   "description": "",
   "main": "app.js",
   "scripts": {
-    "start": "nodemon app"
+    "start": "nodemon app",
+    "test": "jest"
   },
   "author": "junghoShin",
   "license": "MIT",
   "devDependencies": {
+    "jest": "^27.4.7",
     "nodemon": "^2.0.15"
   },
   "dependencies": {

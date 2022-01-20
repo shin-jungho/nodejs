@@ -88,3 +88,8 @@ describe('isLoggedIn', () => {
 ### ⚠️ test할 대상을 정확히 할 것!!!!!
 
 ### ⚠️ promise의 resolve, reject는 비동기 작업의 처리 과정에서 성공/실패를 구분하는 방법!!!!
+
+## socket
+
+- 라우터에 웹소켓 넘기고 싶을때 : app.set('io', io); 사용
+  > req(s).app.get('io') 라우터에서 socket.io의 io객체 사용가능

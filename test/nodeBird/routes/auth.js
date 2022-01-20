@@ -1,63 +1,115 @@
-const express = require('express');
-const passport = require('passport');
-const bcrypt = require('bcrypt');
-const User = require('../models/user');
-const { isLoggedIn, isNotLoggedIn } = require('./middlewares');
-const router = express.Router();
+const request = require('supertest');
+const { sequelize } = require('../models');
+const app = require('../app');
 
-router.post('/join', isNotLoggedIn, async (req, res, next) => {
-  const { email, nick, password } = req.body;
-  try {
-    const exUser = await User.findOne({ where: { email } });
-    if (exUser) {
-      return res.redirect('/join?error=exist');
-    }
-    const hash = await bcrypt.hash(password, 12);
-    await User.create({
-      email,
-      nick,
-      password: hash,
-    });
-    return res.redirect('/');
-  } catch (error) {
-    console.error(error);
-    return next(error);
-  }
+beforeAll(async () => {
+  await sequelize.sync();
 });
 
-router.post('/login', isNotLoggedIn, (req, res, next) => {
-  req.user; // 로그인 전이여서 req.user 안들어있다.
-  passport.authenticate('local', (authError, user, info) => {
-    if (authError) {
-      console.error(authError);
-      return next(authError);
-    }
-    if (!user) {
-      return res.redirect(`/?loginError=${info.message}`);
-    }
-    return req.login(user, (loginError) => {
-      if (loginError) {
-        console.error(loginError);
-        return next(loginError);
-      }
-      return res.redirect('/');
-    });
-  })(req, res, next); // 미들웨어 내의 미들웨어에는 (req, res, next)를 붙입니다.
+describe('POST /join', () => {
+  test('로그인 안 했으면 가입', (done) => {
+    request(app)
+      .post('/auth/join')
+      .send({
+        email: 'zerohch0@gmail.com',
+        nick: 'zerocho',
+        password: 'nodejsbook',
+      })
+      .expect('Location', '/')
+      .expect(302, done);
+  });
 });
 
-router.get('/logout', isLoggedIn, (req, res) => {
-  // req.user; // 사용자 정보
-  req.logout();
-  req.session.destroy();
-  res.redirect('/');
+describe('POST /login', () => {
+  const agent = request.agent(app);
+  beforeEach((done) => {
+    agent
+      .post('/auth/login')
+      .send({
+        email: 'zerohch0@gmail.com',
+        password: 'nodejsbook',
+      })
+      .end(done);
+  });
+
+  test('이미 로그인했으면 redirect /', (done) => {
+    const message = encodeURIComponent('로그인한 상태입니다.');
+    agent
+      .post('/auth/join')
+      .send({
+        email: 'zerohch0@gmail.com',
+        nick: 'zerocho',
+        password: 'nodejsbook',
+      })
+      .expect('Location', `/?error=${message}`)
+      .expect(302, done);
+  });
 });
 
-router.get('/kakao', passport.authenticate('kakao')); //passport.authenticate('kakao') 실행되면서 kakaostrategy로 이동
+describe('POST /login', () => {
+  test('가입되지 않은 회원', (done) => {
+    const message = encodeURIComponent('가입되지 않은 회원입니다.');
+    request(app)
+      .post('/auth/login')
+      .send({
+        email: 'zerohch1@gmail.com',
+        password: 'nodejsbook',
+      })
+      .expect('Location', `/?loginError=${message}`)
+      .expect(302, done);
+  });
 
-router.get('/kakao/callback', passport.authenticate('kakao', {
-  failureRedirect: '/',
-}), (req, res) => {
-  res.redirect('/');
+  test('로그인 수행', (done) => {
+    request(app)
+      .post('/auth/login')
+      .send({
+        email: 'zerohch0@gmail.com',
+        password: 'nodejsbook',
+      })
+      .expect('Location', '/')
+      .expect(302, done);
+  });
+
+  test('비밀번호 틀림', (done) => {
+    const message = encodeURIComponent('비밀번호가 일치하지 않습니다.');
+    request(app)
+      .post('/auth/login')
+      .send({
+        email: 'zerohch0@gmail.com',
+        password: 'wrong',
+      })
+      .expect('Location', `/?loginError=${message}`)
+      .expect(302, done);
+  });
 });
 
-module.exports = router;
+describe('GET /logout', () => {
+  test('로그인 되어있지 않으면 403', (done) => {
+    request(app)
+      .get('/auth/logout')
+      .expect(403, done);
+  });
+
+  const agent = request.agent(app);
+  beforeEach((done) => {
+    agent
+      .post('/auth/login')
+      .send({
+        email: 'zerohch0@gmail.com',
+        password: 'nodejsbook',
+      })
+      .end(done);
+  });
+
+  test('로그아웃 수행', (done) => {
+    const message = encodeURIComponent('비밀번호가 일치하지 않습니다.');
+    agent
+      .get('/auth/logout')
+      .expect('Location', `/`)
+      .expect(302, done);
+  });
+});
+
+afterAll(async () => {
+  await sequelize.sync({ force: true });
+});

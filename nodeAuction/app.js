@@ -13,7 +13,7 @@ const authRouter = require('./routes/auth');
 const { sequelize } = require('./models');
 const passportConfig = require('./passport');
 const webSocket = require('./socket');
-const sse = require('sse');
+const sse = require('./sse');
 
 const app = express();
 passportConfig();

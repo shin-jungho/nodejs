@@ -32,8 +32,9 @@ module.exports = async () => {
         createdAt: { [Op.gt]: yesterday },
       },
     });
-    unsold.forEach(async (target) => {
+    unsold.forEach((target) => {
       const end = new Date(unsold.createdAt);
+      end.setDate(end.getDate() + 1);
       schedule.scheduleJob(end, async () => {
         const success = await Auction.findOne({
           where: { GoodId: target.id },

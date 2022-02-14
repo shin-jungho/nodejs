@@ -6,7 +6,7 @@ const schedule = require('node-schedule');
 
 const { Good, Auction, User, sequelize } = require('../models');
 const { isLoggedIn, isNotLoggedIn } = require('./middlewares');
-const { sequelize } = require('../models/user');
+
 
 const router = express.Router();
 
@@ -66,7 +66,7 @@ router.post('/good', isLoggedIn, upload.single('img'), async (req, res, next) =>
       price,
     });
     const end = new Date();
-    end.setDate(end.endDate() + 1);
+    end.setDate(end.getDate() + 1);
     schedule.scheduleJob(end, async () => {
       const transaction = await sequelize.transaction();
       try {
